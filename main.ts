@@ -1,21 +1,20 @@
-// Diver — a diversified small-stake early sniper for the pump.fun replay.
+// Diver — a diversified small-stake momentum bot for the pump.fun replay.
 //
-// Thesis: on pump.fun almost every new coin dies, but about one in four at least doubles
-// from its early price before it does (23% reach 2x from real SOL 1 on the dev window),
-// and the spike is usually brief. The edge is not picking the one runner; it is buying
-// many young coins cheaply and letting a wide trailing stop ride the spike while it
-// lasts. Every position is the same small size (0.05 SOL), total cost exposure is capped
-// (1.5 SOL of the 10 SOL paper capital), and exits are mechanical: a wide trailing stop
-// from the peak, a flow-fade exit, or the curve completing. No stop loss on noise (young
-// coins whip), no take-profit that cuts a runner short, no pyramids, no discretion.
-//
-// Entry: a very young curve (20+ slots old, real SOL 2–6) whose last ~20 slots show a
-// burst of broad buying — several distinct buyers, net SOL flowing in, price rising,
-// sitting near its window high. Size fits under the 1%-of-reserve cap by construction.
+// Thesis: on pump.fun almost every new coin dies, so chasing every fresh launch loses
+// to fees. The coins worth buying are the established runners: curves that survived
+// 1,000+ slots and still show broad, sustained buying over a long window (120 slots),
+// with many distinct buyers and real SOL 10–80. Even then most reverse, so every
+// position is the same small size (0.05 SOL), total cost exposure is capped (1.5 SOL
+// of the 10 SOL paper capital), and every exit is mechanical: a stop loss, a trailing
+// stop, a take-profit, a time limit, or a flow reversal. No pyramids, no discretion.
 //
 // The guardrail bar (a >= 0.01 SOL round trip on >= 20 coins, drawdown <= 50%) is met by
-// construction: stakes are 0.05 SOL, turnover is fast, and worst-case loss is bounded by
-// the exposure cap plus fees.
+// construction: stakes are 0.05 SOL, turnover is steady, and worst-case loss is bounded
+// by the exposure cap plus fees. Dev-window result: -0.30 SOL net on 68 round trips
+// over 47 coins — the least-bad of five variants tried, chosen for low trade count
+// (fee drag is the dominant cost) and low drawdown (3.0%), not for a big dev score:
+// the final window is new coins, so robustness across windows matters more than the
+// dev number.
 //
 // Deterministic by construction: no clock, no environment, no randomness; iteration only
 // over insertion-ordered maps fed by the batch stream.
@@ -62,31 +61,31 @@ interface Params {
 }
 
 const P: Params = {
-  window: 20,
-  minNetSol: 0.3,
-  minBuys: 3,
-  minBuyers: 3,
-  minPriceUp: 0.02,
-  maxPriceUp: 1.0,
-  accel: 0.5,
-  nearHigh: 0.9,
-  maxBuyerShare: 0.7,
-  minRqSol: 2,
-  maxRqSol: 6,
-  minAge: 20,
+  window: 120,
+  minNetSol: 3.0,
+  minBuys: 8,
+  minBuyers: 8,
+  minPriceUp: 0.15,
+  maxPriceUp: 1.5,
+  accel: 1.0,
+  nearHigh: 0.95,
+  maxBuyerShare: 0.5,
+  minRqSol: 10,
+  maxRqSol: 80,
+  minAge: 1000,
   stakeSol: 0.05,
   buySlipBps: 1500,
-  stopLoss: 0.99,
-  trail: 0.25,
-  trailArm: 0.0,
-  takeProfit: 1000,
-  maxHold: 6000,
-  holdIfUp: 1000,
-  fadeWindow: 60,
+  stopLoss: 0.12,
+  trail: 0.18,
+  trailArm: 0.08,
+  takeProfit: 0.5,
+  maxHold: 1500,
+  holdIfUp: 0.2,
+  fadeWindow: 40,
   fadeNetSol: 1.0,
-  bigSellSol: 2,
-  cooldown: 150,
-  maxEntries: 1,
+  bigSellSol: 3,
+  cooldown: 300,
+  maxEntries: 2,
   maxExposureSol: 1.5,
 };
 
